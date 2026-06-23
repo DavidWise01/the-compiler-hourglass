@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Hourglass — How a Compile Has a Shape</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght@9..144,0,400;9..144,0,500;9..144,1,500&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#150e21; --ground-2:#1d1430; --surface:#241836; --surface-2:#2c1f42;
+    --edge:#3a2a58; --ink:#ece1f7; --ink-soft:#c3b3da; --ink-mute:#8c7aa6;
+    --violet:#b98bff; --violet-deep:#7c4bd8;
+    --neck:#7fe7ff; --sand:#e6b04e; --rose:#ff7aa8; --teal:#5eead4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:
+      radial-gradient(1000px 680px at 50% -8%, rgba(127,231,255,.10), transparent 56%),
+      radial-gradient(900px 620px at 6% 12%, rgba(120,60,180,.16), transparent 55%),
+      var(--ground);
+    color:var(--ink); font-family:"Space Grotesk",system-ui,sans-serif; line-height:1.6;
+    -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:99;opacity:.04;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:0 24px;}
+
+  header{padding:76px 0 8px;text-align:center;}
+  .eyebrow{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.3em;
+    text-transform:uppercase;color:var(--neck);margin-bottom:22px;}
+  h1{font-family:"Fraunces",serif;font-weight:500;font-size:clamp(44px,8vw,92px);line-height:.95;letter-spacing:-.02em;}
+  h1 em{font-style:italic;color:var(--neck);}
+  .thesis{margin:22px auto 0;max-width:60ch;font-size:18px;color:var(--ink-soft);}
+  .thesis em{font-style:italic;color:var(--neck);}
+
+  /* hourglass hero */
+  .hero{margin:18px auto 0;max-width:680px;}
+  .hero svg{width:100%;height:auto;display:block;}
+  .hero .cap{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:6px;
+    font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--ink-mute);}
+  .hero .cap b{color:var(--neck);}
+
+  section{padding:54px 0 4px;}
+  .sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:6px;flex-wrap:wrap;}
+  .sec-head h2{font-family:"Fraunces",serif;font-weight:500;font-size:clamp(25px,3.8vw,38px);letter-spacing:-.01em;}
+  .sec-head .tag{font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.06em;
+    padding:4px 11px;border-radius:999px;border:1px solid var(--edge);color:var(--ink-soft);}
+  .sec-sub{max-width:76ch;color:var(--ink-soft);margin:4px 0 24px;font-size:16px;}
+  .sec-sub em{color:var(--neck);font-style:normal;}
+
+  .slopes{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:680px){.slopes{grid-template-columns:1fr;}}
+  .slope{border:1px solid var(--edge);border-radius:14px;padding:18px 20px;
+    background:linear-gradient(180deg,var(--surface),var(--ground-2));}
+  .slope h3{font-family:"Fraunces",serif;font-weight:500;font-size:20px;margin-bottom:3px;}
+  .slope .lab{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.05em;
+    text-transform:uppercase;margin-bottom:10px;}
+  .slope.up .lab{color:var(--sand);} .slope.down .lab{color:var(--neck);}
+  .slope p{font-size:13.5px;color:var(--ink-soft);line-height:1.55;}
+  .slope .flow{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--ink-mute);
+    margin-top:11px;line-height:1.7;}
+  .slope .flow b{color:var(--ink-soft);}
+  .neck-note{text-align:center;margin:18px auto;max-width:62ch;font-size:14px;color:var(--ink-soft);
+    border-top:1px solid var(--edge);border-bottom:1px solid var(--edge);padding:16px 0;}
+  .neck-note b{color:var(--neck);}
+
+  .math{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center;margin-top:8px;}
+  @media (max-width:680px){.math{grid-template-columns:1fr;}}
+  .math .box{border:1px solid var(--edge);border-radius:14px;padding:20px;background:rgba(0,0,0,.16);
+    font-family:"JetBrains Mono",monospace;}
+  .math .box .big{font-size:26px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+  .math .box.bad .big{color:var(--rose);} .math .box.good .big{color:var(--teal);}
+  .math .box .sm{font-size:12px;color:var(--ink-mute);line-height:1.6;}
+  .echo{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;}
+  .echo .e{border:1px solid var(--edge);border-radius:12px;padding:13px 15px;background:rgba(0,0,0,.12);}
+  .echo .e h4{font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.04em;color:var(--neck);margin-bottom:5px;}
+  .echo .e p{font-size:12.5px;color:var(--ink-soft);line-height:1.5;}
+
+  .root{border:1px solid var(--edge);border-radius:16px;padding:24px;background:linear-gradient(180deg,var(--surface),var(--ground-2));}
+  .root .pair{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:6px;}
+  @media (max-width:620px){.root .pair{grid-template-columns:1fr;}}
+  .root .who{border-left:2px solid var(--sand);padding-left:14px;}
+  .root .who.ada{border-left-color:var(--neck);}
+  .root .who h3{font-family:"Fraunces",serif;font-weight:500;font-size:20px;}
+  .root .who .yr{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink-mute);margin:2px 0 8px;}
+  .root .who p{font-size:13.5px;color:var(--ink-soft);line-height:1.55;}
+  .root .verdict{margin-top:14px;font-size:13.5px;color:var(--ink-soft);border-top:1px solid var(--edge);padding-top:14px;}
+  .root .verdict b{color:var(--ink);font-weight:500;}
+
+  footer{margin-top:60px;padding:36px 0 70px;border-top:1px solid var(--edge);color:var(--ink-mute);font-size:13px;max-width:82ch;}
+  footer b{color:var(--ink-soft);font-weight:500;}
+  footer em{color:var(--neck);font-style:normal;}
+  .sig{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin-top:20px;color:var(--neck);}
+
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">The evolution of the compiler · the purple papers · VI</div>
+    <h1>The <em>hourglass</em></h1>
+    <p class="thesis">A compile has a shape. Your code climbs from flat text up into meaning, squeezes through one narrow universal neck, then descends into a specific machine. Many languages pour in the top; many machines catch at the bottom; everything passes through the same <em>load-bearing&nbsp;0</em> in the middle.</p>
+  </header>
+
+  <div class="hero">
+    <svg id="glass" viewBox="0 0 600 540" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="cap">
+      <span>top: <b style="color:var(--sand)">languages</b> fall in</span>
+      <span>neck: <b>the IR · 0</b></span>
+      <span>bottom: <b style="color:var(--teal)">machines</b> catch</span>
+    </div>
+  </div>
+
+  <section id="slopes">
+    <div class="sec-head"><h2>Ascend · 0 · descend</h2><span class="tag">RAISING → IR → LOWERING</span></div>
+    <p class="sec-sub">Two slopes meet at the neck. Up the front you <em>climb into meaning</em>; down the back you <em>fall into machine</em>. They mirror each other in shape but not in nature — and the tree you climbed turns into a graph on the way down.</p>
+    <div class="slopes">
+      <div class="slope up">
+        <div class="lab">↑ front slope — raising</div>
+        <h3>Climb into meaning</h3>
+        <p>Start at the bottom: flat characters, <code style="font-family:monospace;color:var(--sand)">print("hi")</code>. Group them into words, build them into a tree, ascend toward the most abstract, best-understood form — the point where the compiler finally knows <b>what you meant</b>. Lossless, deterministic, a clean funnel.</p>
+        <div class="flow"><b>text → tokens → parse&nbsp;tree → IR</b><br>shape: a <b>tree</b> (decomposition)</div>
+      </div>
+      <div class="slope down">
+        <div class="lab">↓ back slope — lowering</div>
+        <h3>Fall into machine</h3>
+        <p>From the neck, descend toward one specific chip: IR → optimized IR → assembly → machine code → micro-ops. But here the optimizer <b>rolls downhill on a cost surface</b>, choosing the cheapest path — a gradient-style search. So the descent is lumpy where the climb was smooth.</p>
+        <div class="flow"><b>IR → optimize → assembly → machine</b><br>shape: a <b>graph</b> (dependencies)</div>
+      </div>
+    </div>
+    <p class="neck-note">You <b>climb a tree</b> and <b>descend a graph</b> — and the shape changes exactly at the neck, because going up is decomposition (always a tree) and coming down requires dependency (always a graph). List → tree → graph, all in one compile.</p>
+  </section>
+
+  <section id="waist">
+    <div class="sec-head"><h2>Why the neck is thin</h2><span class="tag">THE NARROW-WAIST PRINCIPLE</span></div>
+    <p class="sec-sub">The thinness is the whole point. One universal middle is what lets both ends be wide and various — and it's what kills the combinatorial explosion.</p>
+    <div class="math">
+      <div class="box bad">
+        <div class="big">N × M</div>
+        <div class="sm">without a shared neck:<br>every language needs its own translator to every machine.<br>5 languages × 5 machines = <b style="color:var(--rose)">25</b> whole compilers.</div>
+      </div>
+      <div class="box good">
+        <div class="big">N + M</div>
+        <div class="sm">with one IR at the waist:<br>5 front-ends + 5 back-ends, all meeting at the neck.<br>= <b style="color:var(--teal)">10</b> pieces. the thin middle is the feature.</div>
+      </div>
+    </div>
+    <div class="echo">
+      <div class="e"><h4>the internet</h4><p>thousands of apps above, thousands of networks below — one skinny waist, <b style="color:var(--ink)">IP</b>, that everything crosses.</p></div>
+      <div class="e"><h4>the cell</h4><p>thousands of genes up top, thousands of functions below — one waist, the genetic code the ribosome reads.</p></div>
+      <div class="e"><h4>the compiler</h4><p>many languages, many chips — one waist, the <b style="color:var(--ink)">IR</b>. it's why LLVM exists, and why it won.</p></div>
+    </div>
+  </section>
+
+  <section id="root">
+    <div class="sec-head"><h2>The root · 1823</h2><span class="tag">WHERE THE TOWER STARTS</span></div>
+    <p class="sec-sub">Every floor of this hourglass — the whole idea of a machine that runs <em>programs</em> — traces back to one engine and the first person to write code for it.</p>
+    <div class="root">
+      <div class="pair">
+        <div class="who">
+          <h3>Charles Babbage</h3>
+          <div class="yr">1791–1871 · the engine</div>
+          <p>In <b style="color:var(--sand)">1823</b> the British government funded his Difference Engine — arguably the first public money ever spent on a computer. He went on to design the Analytical Engine: a general machine that could be <em>programmed</em>, borrowing punched cards from the Jacquard loom. The hardware the whole tower stands on.</p>
+        </div>
+        <div class="who ada">
+          <h3>Ada Lovelace</h3>
+          <div class="yr">1815–1852 · the program</div>
+          <p>His <b style="color:var(--neck)">collaborator</b> — not his wife. In 1843, translating an account of the Analytical Engine, she added notes containing the first published algorithm and the leap no one else made: that the machine could manipulate <em>any symbols</em>, not just numbers — music, logic, anything. That's the seed of the programs a compiler feeds.</p>
+        </div>
+      </div>
+      <div class="verdict"><b>On the "stole it from his wife" version:</b> Ada wasn't his wife (his wife, Georgiana, died in 1827, unrelated to the machines), and it was 1843, not 1823. The credit is a genuine two-sided fight: some historians say her Notes were written under Babbage's supervision and reflect <em>his</em> understanding; others credit her with the real conceptual jump. She's one of the rare cases that's been both over- and under-credited — so the honest verdict isn't "robbed," it's "still argued about."</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <p><b>Gate kept on.</b> The <em>hourglass / narrow-waist</em> framing is a real and named design principle; the <em>11-row "base 11"</em> is your own motif (the rows run 5·4·3·2·1·0·1·2·3·4·5 = 11), not a formal compiler term — but it's a true count, and the <em>0</em> really is load-bearing. "First" claims here have the usual definitional edges: Babbage is widely called the originator of the programmable computer, Lovelace the first programmer, both with caveats. Quotes and dates paraphrased from Wikipedia, the Bodleian Ada Lovelace archive, and history-of-computing scholarship.</p>
+    <div class="sig">The purple papers · VI · companion to sheets I–V</div>
+  </footer>
+
+</div>
+
+<script>
+const reduce=(window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches)||false;
+const NS="http://www.w3.org/2000/svg";
+const svg=document.getElementById('glass');
+function el(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+
+/* geometry */
+const cx=300, topY=46, neckY=270, botY=494, maxHalf=232, neckHalf=18;
+const LEVELS=[5,4,3,2,1,0,1,2,3,4,5];
+function halfAt(level){ return Math.max(neckHalf, (level/5)*maxHalf); }
+
+/* faint 11-row guides (the base-11 structure) */
+for(let k=0;k<11;k++){
+  const y=topY+(botY-topY)*(k/10);
+  const hw=halfAt(LEVELS[k]);
+  svg.appendChild(el("line",{x1:cx-hw,y1:y,x2:cx+hw,y2:y,
+    stroke:"rgba(185,139,255,.16)","stroke-width":1}));
+  svg.appendChild(el("text",{x:cx+maxHalf+14,y:y+3,"font-family":"JetBrains Mono, monospace",
+    "font-size":10,fill:"#6f5c86","text-anchor":"start"})).textContent=LEVELS[k];
+}
+/* base-11 note */
+const note=el("text",{x:cx+maxHalf+14,y:topY-14,"font-family":"JetBrains Mono, monospace","font-size":10,fill:"#8c7aa6"});
+note.textContent="11 rows · base 11"; svg.appendChild(note);
+
+/* hourglass vessel outline */
+const vessel="rgba(214,176,94,.55)";
+svg.appendChild(el("path",{d:`M ${cx-maxHalf} ${topY} L ${cx-neckHalf} ${neckY} L ${cx-maxHalf} ${botY}`,
+  fill:"none",stroke:vessel,"stroke-width":2,"stroke-linejoin":"round"}));
+svg.appendChild(el("path",{d:`M ${cx+maxHalf} ${topY} L ${cx+neckHalf} ${neckY} L ${cx+maxHalf} ${botY}`,
+  fill:"none",stroke:vessel,"stroke-width":2,"stroke-linejoin":"round"}));
+svg.appendChild(el("line",{x1:cx-maxHalf,y1:topY,x2:cx+maxHalf,y2:topY,stroke:vessel,"stroke-width":2}));
+svg.appendChild(el("line",{x1:cx-maxHalf,y1:botY,x2:cx+maxHalf,y2:botY,stroke:vessel,"stroke-width":2}));
+
+/* neck glow + label */
+const ng=el("radialGradient",{id:"ng"});
+ng.appendChild(el("stop",{offset:"0%","stop-color":"#7fe7ff","stop-opacity":".9"}));
+ng.appendChild(el("stop",{offset:"100%","stop-color":"#7fe7ff","stop-opacity":"0"}));
+const defs=el("defs",{}); defs.appendChild(ng); svg.appendChild(defs);
+svg.appendChild(el("circle",{cx,cy:neckY,r:34,fill:"url(#ng)"}));
+svg.appendChild(el("circle",{cx,cy:neckY,r:6,fill:"#7fe7ff"}));
+const nl=el("text",{x:cx,y:neckY-44,"text-anchor":"middle","font-family":"JetBrains Mono, monospace",
+  "font-size":13,"font-weight":"700",fill:"#7fe7ff"}); nl.textContent="IR · 0"; svg.appendChild(nl);
+const nl2=el("text",{x:cx,y:neckY+50,"text-anchor":"middle","font-family":"JetBrains Mono, monospace",
+  "font-size":10,fill:"#8c7aa6"}); nl2.textContent="the load-bearing neck"; svg.appendChild(nl2);
+
+/* entries (languages) & exits (machines) */
+const LANGS=[{n:"Python",c:"#ffce5c"},{n:"C",c:"#f0a35c"},{n:"Rust",c:"#ff8c6c"},{n:"COBOL",c:"#ff7aa8"},{n:"Fortran",c:"#e6b04e"}];
+const MACH =[{n:"x86",c:"#5eead4"},{n:"ARM",c:"#5cd3ff"},{n:"RISC-V",c:"#7c9cff"},{n:"GPU",c:"#b98bff"},{n:"WASM",c:"#6ce0a8"}];
+const exsX=[120,210,300,390,480];
+LANGS.forEach((l,i)=>{
+  svg.appendChild(el("circle",{cx:exsX[i],cy:topY-2,r:3,fill:l.c}));
+  const t=el("text",{x:exsX[i],y:topY-12,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":10.5,fill:l.c});
+  t.textContent=l.n; svg.appendChild(t);
+});
+MACH.forEach((m,i)=>{
+  svg.appendChild(el("circle",{cx:exsX[i],cy:botY+2,r:3,fill:m.c}));
+  const t=el("text",{x:exsX[i],y:botY+18,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":10.5,fill:m.c});
+  t.textContent=m.n; svg.appendChild(t);
+});
+
+/* grains: programs falling many -> one -> many */
+const gLayer=el("g",{}); svg.appendChild(gLayer);
+const N=40, grains=[];
+function spawn(g, stagger){
+  g.entry=Math.floor(Math.random()*5);
+  g.exit=Math.floor(Math.random()*5);
+  g.t=stagger!=null?stagger:0;
+  g.spd=0.0016+Math.random()*0.0012;
+}
+function lerp(a,b,u){return a+(b-a)*u;}
+function pos(g){
+  if(g.t<0.5){const u=g.t/0.5;return {x:lerp(exsX[g.entry],cx,u),y:lerp(topY,neckY,u),c:LANGS[g.entry].c};}
+  const u=(g.t-0.5)/0.5;return {x:lerp(cx,exsX[g.exit],u),y:lerp(neckY,botY,u),c:MACH[g.exit].c};
+}
+for(let i=0;i<N;i++){const c=el("circle",{r:3,fill:"#fff"});gLayer.appendChild(c);
+  const g={el:c};spawn(g,Math.random());grains.push(g);}
+
+function frame(dt){
+  for(const g of grains){
+    if(!reduce){ g.t+=g.spd*dt; if(g.t>=1) spawn(g,0); }
+    const p=pos(g);
+    const near=Math.abs(g.t-0.5);
+    const r=near<0.06?4.4:3;                    // bloom at the neck
+    g.el.setAttribute('cx',p.x.toFixed(1));
+    g.el.setAttribute('cy',p.y.toFixed(1));
+    g.el.setAttribute('r',r);
+    g.el.setAttribute('fill', near<0.05? '#7fe7ff' : p.c);
+    g.el.setAttribute('opacity', near<0.05?1:.92);
+  }
+}
+if(reduce){ grains.forEach((g,i)=>{g.t=(i/N);}); frame(0); }
+else{ let last=performance.now();
+  (function loop(now){const dt=Math.min(now-last,40);last=now;frame(dt);requestAnimationFrame(loop);})(performance.now());
+}
+</script>
+</body>
+</html>
